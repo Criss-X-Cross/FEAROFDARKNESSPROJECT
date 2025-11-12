@@ -67,7 +67,7 @@ public class footSteps : MonoBehaviour
             if (Input.GetKey(KeyCode.LeftShift))
             {
                 //footstepsSound.pitch = 1.5f;
-                footstepsSound.enabled = true;
+                footstepsSound.enabled = false;
                 sprintSound.enabled = true;
                 //sprintSound.volume = 1f;
                 footstepsSound.pitch = Mathf.MoveTowards(footstepsSound.pitch, sprintSpeed, Time.deltaTime * 1f);
