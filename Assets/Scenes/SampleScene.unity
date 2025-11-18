@@ -1627,7 +1627,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   walkSpeed: 3
-  sprintMultiplier: 1.3
+  sprintMultiplier: 2
   jumpForce: 5
   gravityMultiplier: 1.5
   mouseSensitivity: 0.1
@@ -1650,7 +1650,7 @@ MonoBehaviour:
   footstepsSound: {fileID: 509327089}
   sprintSound: {fileID: 1397686366}
   characterController: {fileID: 0}
-  walkSpeed: 0.5
+  walkSpeed: 0.8
   sprintSpeed: 1
   walkVolume: 1
   sprintVolume: 1
