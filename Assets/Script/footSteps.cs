@@ -12,6 +12,12 @@ public class footSteps : MonoBehaviour
     public float walkSpeed;
     public float sprintSpeed;
 
+    [Header("footsteps volume")]
+    [SerializeField] private float walkVolume;
+    [SerializeField] private float sprintVolume;
+
+
+
     private bool isJumping = false;
 
     void Start()
@@ -23,6 +29,8 @@ public class footSteps : MonoBehaviour
     void Update()
     {
         // Update jumping state
+        walkVolume = footstepsSound.volume = PlayerPrefs.GetFloat("walkVolume", walkVolume);
+        sprintVolume = sprintSound.volume = PlayerPrefs.GetFloat("sprintVolume", sprintVolume);
         if (characterController != null)
         {
             // Use CharacterController to detect airborne state
