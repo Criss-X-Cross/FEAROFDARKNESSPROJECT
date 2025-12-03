@@ -78,7 +78,8 @@ public class Sanity : MonoBehaviour
         {
             if (c == myCol) continue;
             BoxCollider bc = c.GetComponent<BoxCollider>();
-            bool match = (bc != null && bc.isTrigger) || c.CompareTag("SafeBox");
+            //bool match = (bc != null && bc.isTrigger) || c.CompareTag("SafeBox");
+            bool match = c.CompareTag("SafeBox"); //Triggered only in safeBox tagged areas
             if (match)
             {
                 insideBox = true;
@@ -92,8 +93,9 @@ public class Sanity : MonoBehaviour
     private void OnTriggerEnter(Collider other)
     {
         var bc = other.GetComponent<BoxCollider>();
-        bool match = (bc != null && bc.isTrigger) || other.CompareTag("SafeBox");
-        Debug.Log($"Sanity.OnTriggerEnter: other={other.name}, hasBoxCollider={(bc != null)}, isTrigger={(bc != null ? bc.isTrigger : false)}, compareTagSafeBox={other.CompareTag("SafeBox")}, match={match}");
+        //bool match = (bc != null && bc.isTrigger) || other.CompareTag("SafeBox");
+        bool match = other.CompareTag("SafeBox"); //Triggered only in safeBox tagged areas
+        //Debug.Log($"Sanity.OnTriggerEnter: other={other.name}, hasBoxCollider={(bc != null)}, isTrigger={(bc != null ? bc.isTrigger : false)}, compareTagSafeBox={other.CompareTag("SafeBox")}, match={match}");
 
         if (match)
         {
@@ -105,8 +107,9 @@ public class Sanity : MonoBehaviour
     private void OnTriggerExit(Collider other)
     {
         var bc = other.GetComponent<BoxCollider>();
-        bool match = (bc != null && bc.isTrigger) || other.CompareTag("SafeBox");
-        Debug.Log($"Sanity.OnTriggerExit: other={other.name}, match={match}");
+        //bool match = (bc != null && bc.isTrigger) || other.CompareTag("SafeBox");
+        bool match = other.CompareTag("SafeBox"); //Triggered only in safeBox tagged areas
+        //Debug.Log($"Sanity.OnTriggerExit: other={other.name}, match={match}");
 
         if (match)
         {
