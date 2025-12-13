@@ -15,106 +15,121 @@ public class Sanity : MonoBehaviour
     [SerializeField, Tooltip("Current sanity (visible in inspector)")]
     private float currentSanity;
 
-    // True while player is inside a BoxCollider trigger area
-    // not serialized to avoid inspector persisting an incorrect value
     private bool insideBox = false;
 
     public float CurrentSanity => currentSanity;
     public float NormalizedSanity => maxSanity > 0f ? currentSanity / maxSanity : 0f;
     public bool IsDepleted => currentSanity <= 0f;
 
-    // True when currently refilling (inside box AND not already full)
     public bool IsRefilling => insideBox && currentSanity < maxSanity;
+
+    //Sound
+    [Header("Low Sanity Sound")]
+    public AudioSource heartBeat;
+    public AudioSource breathing;
+
+    public float lowSanityThreshold = 25f;
+    public bool isLowSanityActive = false;
 
     void Start()
     {
-        // ensure sane initial state
         insideBox = false;
-        if (currentSanity <= 0f) currentSanity = maxSanity;
-        currentSanity = Mathf.Clamp(currentSanity, 0f, maxSanity);
 
-        // Detect if we are already overlapping a safe trigger at start
+        currentSanity = maxSanity; // <-- PENTING
+        isLowSanityActive = false;
+
         DetectInitialInside();
 
-        Debug.Log($"Sanity.Start: currentSanity={currentSanity}, insideBox={insideBox}");
+        if (heartBeat != null) heartBeat.Stop();
+        if (breathing != null) breathing.Stop();
     }
 
-    void Update()
+        void Update()
     {
-        // Drain or refill depending on whether we're inside the box
         if (insideBox)
         {
             currentSanity += refillRate * Time.deltaTime;
-            Debug.Log("Fill Sanity: " + currentSanity);
         }
         else
         {
             currentSanity -= drainRate * Time.deltaTime;
-            Debug.Log("Drain Sanity: " + currentSanity);
 
         }
 
         currentSanity = Mathf.Clamp(currentSanity, 0f, maxSanity);
 
-        if (IsDepleted)
+        HandleLowSanitySound();
+
+    }
+    private void HandleLowSanitySound()
+    {
+        if (heartBeat == null || breathing == null) return;
+
+        if (currentSanity <= lowSanityThreshold)
         {
-            // TODO: trigger death/insanity behaviour here
+            if (!isLowSanityActive)
+            {
+                heartBeat.Play();
+                breathing.Play();
+                isLowSanityActive = true;
+            }
+
+            // Volume makin besar saat sanity makin rendah
+            float t = currentSanity / lowSanityThreshold; // 1 → 0
+            heartBeat.volume = Mathf.Lerp(3f, 0.5f, t);
+            breathing.volume = Mathf.Lerp(1f, 0.2f, t);
+        }
+        else
+        {
+            if (isLowSanityActive)
+            {
+                heartBeat.Stop();
+                breathing.Stop();
+                isLowSanityActive = false;
+            }
         }
     }
-
-    // Try to detect initial overlap using the player's collider bounds.
     private void DetectInitialInside()
     {
         Collider myCol = GetComponent<Collider>();
         if (myCol == null)
         {
-            Debug.LogWarning("Sanity: No Collider found on this GameObject; cannot check initial overlap.");
             return;
         }
 
-        // OverlapBox uses half-extents (bounds.extents)
         Collider[] hits = Physics.OverlapBox(myCol.bounds.center, myCol.bounds.extents, transform.rotation);
         foreach (var c in hits)
         {
             if (c == myCol) continue;
             BoxCollider bc = c.GetComponent<BoxCollider>();
-            //bool match = (bc != null && bc.isTrigger) || c.CompareTag("SafeBox");
             bool match = c.CompareTag("SafeBox"); //Triggered only in safeBox tagged areas
             if (match)
             {
                 insideBox = true;
-                Debug.Log($"Sanity: Detected starting inside safe area via collider '{c.name}'");
                 return;
             }
         }
     }
 
-    // Requires the safe area to use a BoxCollider (recommended as isTrigger = true)
     private void OnTriggerEnter(Collider other)
     {
         var bc = other.GetComponent<BoxCollider>();
-        //bool match = (bc != null && bc.isTrigger) || other.CompareTag("SafeBox");
         bool match = other.CompareTag("SafeBox"); //Triggered only in safeBox tagged areas
-        //Debug.Log($"Sanity.OnTriggerEnter: other={other.name}, hasBoxCollider={(bc != null)}, isTrigger={(bc != null ? bc.isTrigger : false)}, compareTagSafeBox={other.CompareTag("SafeBox")}, match={match}");
 
         if (match)
         {
             insideBox = true;
-            Debug.Log("Sanity: Entered safe box (insideBox=true)");
         }
     }
 
     private void OnTriggerExit(Collider other)
     {
         var bc = other.GetComponent<BoxCollider>();
-        //bool match = (bc != null && bc.isTrigger) || other.CompareTag("SafeBox");
         bool match = other.CompareTag("SafeBox"); //Triggered only in safeBox tagged areas
-        //Debug.Log($"Sanity.OnTriggerExit: other={other.name}, match={match}");
 
         if (match)
         {
             insideBox = false;
-            Debug.Log("Sanity: Exited safe box (insideBox=false)");
         }
     }
 }
