@@ -37,11 +37,13 @@ public class FirstPersonController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        HandleMenu();
-        if(Cursor.lockState == CursorLockMode.None)
+        if (Time.timeScale == 0f)
             return;
+
         HandleMovement();
         HandleRotation();
+        Debug.Log("FPS Update");
+
     }
 
     public void LockCursor()
@@ -80,21 +82,6 @@ public class FirstPersonController : MonoBehaviour
             currentMovement.y += Physics.gravity.y * gravityMultiplier * Time.deltaTime;
         }
 
-    }
-
-    private void HandleMenu()
-    {
-        if (playerInputHandler.MenuTriggered)
-        {
-            if (Cursor.lockState == CursorLockMode.Locked)
-            {
-                UnlockCursor();
-            }
-            else
-            {
-                LockCursor();
-            }
-        }
     }
 
     private void HandleMovement()
